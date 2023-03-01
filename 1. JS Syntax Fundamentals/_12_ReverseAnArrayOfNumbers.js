@@ -12,7 +12,7 @@ function reverse(revCnt, inputArr) {
     for(let i=newArr.length - 1; i>=0; i--) {
         output += newArr[i] + " ";
     }
-    output = output;
+    
     console.log(output);
 }
 
