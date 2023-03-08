@@ -20,4 +20,4 @@ function SimpleCalculator(n1, n2, command) {
     console.log(result);
 }
 
-SimpleCalculator(5,5,'multiply')
+SimpleCalculator(5,5,'multiply');
