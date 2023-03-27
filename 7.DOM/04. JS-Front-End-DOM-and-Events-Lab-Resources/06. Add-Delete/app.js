@@ -7,6 +7,7 @@ function addItem() {
 
     newLi.textContent = input.value;
     newAnchor.textContent = "[Delete]";
+    newAnchor.setAttribute("href", "#")
     
     newAnchor.addEventListener("click", deleteHandler);
 
