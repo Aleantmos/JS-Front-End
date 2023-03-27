@@ -1,7 +1,7 @@
 function showText() {
-    const anchor = document.getElementById("more");
-    const span = document.getElementById("text");
-
+    const anchor = document.getElementById('more');
+    const span = document.getElementById('text');
     span.style.display = "inline";
-    anchor.style.display = "none";
+
+    anchor.style.display = "none"
 }

@@ -43,22 +43,22 @@ function manageFlights(input) {
             .find(flight => {
                 if (flight.flightNumber === fNumbersStatusToChange) {
                     flight.changeStatus(status);
-                }});
-    }
-    
-
-
-let flightsWithStatusNeeded = input[2][0];
-
-
-for (let i = 0; i < flightArr.length; i++) {
-
-    if (flightArr[i].status === flightsWithStatusNeeded) {
-        console.log(JSON.stringify(flightArr[i]));
+                }
+            });
     }
 
-}
 
+
+    let flightsWithStatusNeeded = input[2][0];
+
+
+    for (let i = 0; i < flightArr.length; i++) {
+
+        if (flightArr[i].status === flightsWithStatusNeeded) {
+            console.log(JSON.stringify(flightArr[i]));
+        }
+
+    }
 
 }
 manageFlights([['WN269 Delaware',
