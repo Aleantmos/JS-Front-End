@@ -1,115 +1,147 @@
 function attachEvents() {
+    const TASKS_URL = 'http://localhost:3030/jsonstore/tasks/';
 
-    const BASE_URL = "http://localhost:3030/jsonstore/tasks/";
+    const task = document.getElementById('title');
 
-    const titleInput = document.getElementById('title');
-    const loadBtn = document.getElementById('load-button');
     const addBtn = document.getElementById('add-button');
-    const todoListContainer = document.getElementById('todo-list');
+    addBtn.addEventListener('click', addTaskHandler);
 
-    loadBtn.addEventListener('click', loadTasksHandler);
-    addBtn.addEventListener('click', addTastHandler);
+    const loadBtn = document.getElementById('load-button');
+    loadBtn.addEventListener('click', loadAllTasksHandler);
 
-    function loadTasksHandler(event) {
+
+
+    const ul = document.getElementById('todo-list');
+
+
+    function loadAllTasksHandler(event) {
 
         if (event) {
             event.preventDefault();
         }
+        ul.innerHTML = '';
 
-        todoListContainer.innerHTML = "";
-        fetch(BASE_URL)
-            .then((data) => data.json())
+        fetch(TASKS_URL)
+            .then((res) => res.json())
             .then((tasksRes) => {
                 const tasks = Object.values(tasksRes);
+                for (const { _id, taskName } of tasks) {
 
-                for (const { _id, name } of tasks) {
-                    const li = document.createElement('li');
-                    const span = document.createElement('span');
-                    const removeBtn = document.createElement('button');
-                    const editBtn = document.createElement('button');
+                    const li = createElement('li', '', ul, _id);
+                    createElement('span', taskName, li);
+                    const removeBtn = createElement('button', 'Remove', li);
+                    const editBtn = createElement('button', 'Edit', li);
 
-                    li.id = _id;
-                    span.textContent = name;
-                    removeBtn.textContent = 'Remove';
-                    editBtn.textContent = 'Edit';
-
-                    editBtn.addEventListener('click', loadEditFormHandler);
-                    removeBtn.addEventListener('click', removeTaskHandler);
-
-                    li.append(span, removeBtn, editBtn);
-                    todoListContainer.appendChild(li);
+                    removeBtn.addEventListener('click', removeBtnHandler);
+                    editBtn.addEventListener('click', editBtnHandler);
                 }
+
+
             })
-            .catch((err) => {
-                console.error(err);
-            })
+
     }
-
-    function loadEditFormHandler(event) {
+    function editBtnHandler(event) {
         const liParent = event.currentTarget.parentNode;
-        const [span, _removeBtn, editBtn] = Array.from(liParent.children);
-        const editInput = document.createElement('input');
+        const [ span, _removeBtn, editBtn] = Array.from(liParent.children);
 
-        editInput.value = span.textContent;
-        liParent.prepend(editInput);
+        const editInput = createElement('input', span.textContent);
+        liParent.prepend(editInput)
 
-        const submitBtn = document.createElement('button');
-        submitBtn.textContent = 'Submit';
+
+        const submitBtn = createElement('button', 'Submit', liParent);
         submitBtn.addEventListener('click', submitTaskHandler);
-        liParent.appendChild(submitBtn);
 
         span.remove();
         editBtn.remove();
+
     }
 
     function submitTaskHandler(event) {
         const liParent = event.currentTarget.parentNode;
         const id = event.currentTarget.parentNode.id;
-        const [input] = Array.from(liParent.children);
+        const [ input ] = Array.from(liParent.children);
 
-        const httpHeaders = {
-            method: 'PATCH',
-            body: JSON.stringify({ name: input.value })
+        const httpHeader = {
+            method: "PATCH",
+            body: JSON.stringify({ taskName: input.value })
         }
 
-        fetch(`${BASE_URL}${id}`, httpHeaders)
-            .then(() => loadTasksHandler())
+        fetch(`${TASKS_URL}${id}`, httpHeader)
+            .then(() => loadAllTasksHandler())
             .catch((err) => {
                 console.log(err);
             })
     }
 
-    function addTastHandler(event) {
-        event.preventDefault();
-        const name = titleInput.value;
+    function removeBtnHandler(event) {
+        const id = event.currentTarget.parentNode.id;
+        console.log(id);
+        const httpHeader = {
+            method: 'DELETE',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(id)
+        }
 
-        const htttHeaders = {
+        fetch(`${TASKS_URL}${id}`, httpHeader)
+            .then(() => loadAllTasksHandler())
+            .catch((err) => {
+                console.error(err);
+            })
+    }
+
+
+    function addTaskHandler(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        const taskName = task.value;
+
+        const httpHeader = {
             method: 'POST',
-            body: JSON.stringify( {name} )
+            body: JSON.stringify({ taskName })
         }
 
-        fetch(BASE_URL, htttHeaders)
+        fetch(`${TASKS_URL}`, httpHeader)
             .then(() => {
-                loadTasksHandler();
-                titleInput.value = '';
+                loadAllTasksHandler();
+                task.value = '';
             })
             .catch((err) => {
                 console.log(err);
             })
     }
 
-    function removeTaskHandler(event) {
-        const id = event.currentTarget.parentNode;
-        
-        const httpHeaders = {
-            method: 'DELETE'
-        };
 
-        fetch(`${BASE_URL}${id}`, httpHeaders)
-            .then(() => loadTasksHandler())
-            .catch((err) => {
-                console.log(err);
-            }) 
+    function createElement(type, content, parentNode, id, classes, attributes) {
+        const htmlElement = document.createElement(type);
+
+        if (content && type === 'input') {
+            htmlElement.value = content;
+        }
+
+        if (content && type !== 'input') {
+            htmlElement.textContent = content;
+        }
+
+        if (id) {
+            htmlElement.id = id;
+        }
+
+        if (classes) {
+            htmlElement.classList.add(classes);
+        }
+
+        if (attributes) {
+            for (const key in attributes) {
+                htmlElement.setAttribute(key, attributes[key]);
+            }
+        }
+
+        if (parentNode) {
+            parentNode.appendChild(htmlElement);
+        }
+
+        return htmlElement;
     }
 }
 
