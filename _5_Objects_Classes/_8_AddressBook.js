@@ -6,7 +6,7 @@ function AddressBook(arr) {
         addressbook[name] = address;
     }
 
-    let sorted = Object.entries(addressbook).sort();
+    let sorted = Object.keys(addressbook).sort();
 
     for (const element of sorted) {
         console.log(`${element} -> ${addressbook[element]}`)
