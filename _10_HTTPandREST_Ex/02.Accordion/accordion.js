@@ -1,11 +1,11 @@
 async function solution() {
-    const ARTICLE_TITLE_URL = "http://localhost:3030/jsonstore/advanced/articles/list";
+    const ARTICLE_TITLE_URL = "http://localhost:3030/jsonstore/advanced/articles/list/";
     const DETAILS_URL = "http://localhost:3030/jsonstore/advanced/articles/details/";
 
     const main = document.querySelector('#main');
 
 
-    const createElement = (type, content, parentNode, id, clazz, attributes) => {
+    const createElement = (type, content, parentNode, clazz, attributes) => {
         const htmlElement = document.createElement(type);
 
         if (content && type === 'input') {
@@ -16,12 +16,9 @@ async function solution() {
             htmlElement.textContent = content; 
         }
 
-        if (id) {
-            htmlElement.id = id;
-        }
 
         if (clazz) {
-            htmlElement.class = clazz;
+            htmlElement.classList.add(clazz);
         }
 
         if (parentNode) {
@@ -30,31 +27,51 @@ async function solution() {
 
         if (attributes) {
             for (const key in attributes) {
-                htmlElement.setAttributes(key, attributes[key]);
+                htmlElement.setAttribute(key, attributes[key]);
             }
         }
 
         return htmlElement;
     }
 
-    const createHtmlElement = async (data) => {
-        const accordian = createElement('div', '', main, '', 'accordian');
-        const head = createElement('div', '', accordian, '', 'head');
-        const title = createElement('span', data.title, head);
-        const btn = createElement('button', 'More', head, data.id);
+    const btnShowMoreHandler = () => {
+        const btn = event.target;
 
-        const extra = createElement('div', '', accordian, '', 'extra');
+        const extraInfo = btn.parentElement.parentElement.querySelector('.extra');
+
+        if (btn.textContent === 'More') {
+            extraInfo.style.display = 'inline-block';
+            btn.textContent = 'Less';
+        } else {
+            extraInfo.style.display = 'none';
+            btn.textContent = 'More';
+        }
+    }
+
+    const createHtmlElement = async (data) => {
+        const accordian = createElement('div', '', main, 'accordion');
+        const head = createElement('div', '', accordian, 'head');
+        const title = createElement('span', data.title, head);
+        const btn = createElement('button', 'More', head, "", {id: data._id});
+
+        btn.addEventListener('click', btnShowMoreHandler)
+
+        const extra = createElement('div', '', accordian, 'extra');
 
         const content = await loadDetails(data._id);
-        createElement('p', content, extra);
+        console.log(content)
+        createElement('p', content.content, extra);
+
+        return accordian;
     }
 
     const loadData = async () => {
-        const data = await fetch (ARTICLE_TITLE_URL);
+        const data = await fetch(`${ARTICLE_TITLE_URL}`);
         return await data.json();
     }
 
     const loadDetails = async (id) => {
+        console.log(id);
         const data = await fetch(`${DETAILS_URL}${id}`);
         return await data.json();
     }
